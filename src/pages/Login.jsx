@@ -26,17 +26,16 @@ const Login = () => {
       setError("")
 
       const response = await login({ email, password })
-
-      // Save token + user to Zustand + localStorage
-      setAuth(response.data.token, response.data.user)
+      
+      setAuth(response.data.token, response.data.user);
 
       // Redirect to applications
-      navigate("/applications")
-
+      navigate("/applications");
+      
     } catch (err) {
-      setError(err.response?.data?.error || "Login failed. Try again.")
+      setError(err.response?.data?.error || "Login failed. Try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
