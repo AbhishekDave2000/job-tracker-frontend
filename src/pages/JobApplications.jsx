@@ -1,4 +1,4 @@
-import navbar from '../components/Navbar';
+import Navbar from '../components/Navbar';
 
 const JobApplications = () => {
     return(

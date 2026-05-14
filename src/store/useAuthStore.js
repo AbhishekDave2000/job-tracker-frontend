@@ -1,12 +1,22 @@
 import { create } from 'zustand';
 
+const safeParseUser = () => {
+    try {
+        const user = localStorage.getItem("user")
+        return user ? JSON.parse(user) : null
+    } catch {
+        localStorage.removeItem("user")  // clear the bad value
+        return null
+    }
+}
+
 const useAuthStore = create( (set) => ({
     token: localStorage.getItem("token") || null,
-    user:  JSON.parse(localStorage.getItem("user")) || null,
+    user:  safeParseUser(),
 
     setAuth: (token, user) => {
         localStorage.setItem("token", token);
-        localStorage.setItem("user", user);
+        localStorage.setItem("user", JSON.stringify(user));
         set({token, user})
     },
 
