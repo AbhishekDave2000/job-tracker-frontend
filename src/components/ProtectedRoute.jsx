@@ -4,7 +4,9 @@ import useAuthStore from '../store/useAuthStore';
 const ProtectedRoute = ( ({children}) => {
     const { token } = useAuthStore((state) => state.token);
 
-    if(!token) {
+    const localToken = localStorage.getItem("token");
+
+    if(!token && !localToken) {
         return <Navigate to="login" replace />
     }
     return children;
