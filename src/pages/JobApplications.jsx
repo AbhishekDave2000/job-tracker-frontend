@@ -1,6 +1,54 @@
-import Navbar from '../components/Navbar';
+import { useState, useEffect }  from 'react';
+import Navbar                   from '../components/Navbar';
+import StatusBadge              from '../components/StatusBadge';
+import { getJobApplications }   from '../api/jobApplications.api';
+
 
 const JobApplications = () => {
+    const [applications, setApplications]   = useState([]);
+    const [loading, setLoading]             = useState(true);
+    const [error, setError]                 = useState("");
+
+    useEffect(() => {
+        const fetchApplications = async () => {
+            try {
+                const response = await getJobApplications();
+                console.log("Applications: " + response.data.applications);
+                const apps = response.data.applications || [];
+                setApplications(apps);
+            } catch (err) {
+                setError("Failed To Load Applications.");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchApplications();
+    }, []);
+
+    if(loading) {
+        return (
+            <div>
+                <Navbar />
+                <div className="max-w-5xl mx-auto px-6 py-8">
+                    <p className="text-gray-400">Loading...</p>
+                </div>
+            </div>
+        )
+    }
+
+
+    if(error) {
+        return(
+            <div>
+                <Navbar />
+                <div className='max-w-5xl mx-auto px-6 py-8'>
+                    <p className='text-red-500'>{error}</p>
+                </div>
+            </div>
+        )
+    }
+
     return(
         <div>
             <Navbar />
@@ -15,7 +63,41 @@ const JobApplications = () => {
                     </button>
                 </div>
 
-                <p className='text-gray-400'>Applications will show up here.</p>
+
+                { applications.length === 0 ? (
+                    <div className='text-center py-20'>
+                        <div className='text-lg text-gray-400'>No Applications Yet</div>
+                        <p className='text-gray-300 text-sm mt-1'>
+                            Click "+ Add Application" to get started
+                        </p>
+                    </div>
+                ) : ( 
+                    <div className="space-y-3">
+                        {applications.map((app) => (
+                            <div 
+                                key={app.id}
+                                className='bg-white border border-gray-200 rounded-xl px-6 py-4 flex items-center justify-between hover:shadow-sm transition'
+                            >
+                                {/* Left Side */}
+                                <div>
+                                    <h2 className='font-semibold text-gray-800'>{app.company_name}</h2>
+                                    <p className='text-sm text-gray-500 mt-0.5'>{app.job_title}</p>
+                                    <p className='text-xs text-gray-400 mt-1'>
+                                        {app.location} {app.remote ? ". Remote" : ""}
+                                    </p>
+                                </div>
+                                
+                                {/* Right Side */}
+                                <div className='flex flex-col items-end gap-2'>
+                                    <StatusBadge status={app.status} />
+                                    <p className='text-xs text-gray-400'>
+                                        {app.applied_date || "No Date"}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     )
