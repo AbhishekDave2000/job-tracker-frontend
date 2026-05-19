@@ -1,10 +1,13 @@
 import { useState, useEffect }  from 'react';
+import { useNavigate }          from 'react-router-dom';
 import Navbar                   from '../components/Navbar';
 import StatusBadge              from '../components/StatusBadge';
 import { getJobApplications }   from '../api/jobApplications.api';
 
 
+
 const JobApplications = () => {
+    const navigate = useNavigate();
     const [applications, setApplications]   = useState([]);
     const [loading, setLoading]             = useState(true);
     const [error, setError]                 = useState("");
@@ -58,7 +61,9 @@ const JobApplications = () => {
                     <h1 className='text-2xl font-bold text-gray-800'>
                         Job Applications
                     </h1>
-                    <button className='bg-indigo-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition'>
+                    <button 
+                        onClick={() => Navigate('applications/new')}
+                        className='bg-indigo-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition'>
                         + Add Application
                     </button>
                 </div>
