@@ -4,15 +4,19 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import JobApplications from './pages/JobApplications'
+import JobApplicationForm from './pages/JobApplicationForm'
 import './App.css'
 
 const queryClient = new QueryClient();
 
-const ProtectedLayout = () => (
+const ProtectedLayout = () => {
+  console.log("ProtectedLayout rendered");
+  return (
   <ProtectedRoute>
     <Outlet />
   </ProtectedRoute>
-)
+  )
+}
 
 function App() {
   return (
@@ -26,9 +30,7 @@ function App() {
 
           <Route element={<ProtectedLayout />}>
             <Route path="/applications" element={<JobApplications />}/>
-            {/* <Route path="/applications/new" element={<JobApplicationForm />} />
-            <Route path="/applications/:id" element={<JobApplication />} />
-            <Route path="/applications/:id/edit" element={<JobApplicationForm />} /> */}
+            <Route path="/applications/new" element={<JobApplicationForm />} />
           </Route>
 
           {/* Default Router Redirect */}

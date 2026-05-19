@@ -8,6 +8,7 @@ import { getJobApplications }   from '../api/jobApplications.api';
 
 const JobApplications = () => {
     const navigate = useNavigate();
+
     const [applications, setApplications]   = useState([]);
     const [loading, setLoading]             = useState(true);
     const [error, setError]                 = useState("");
@@ -62,7 +63,7 @@ const JobApplications = () => {
                         Job Applications
                     </h1>
                     <button 
-                        onClick={() => Navigate('applications/new')}
+                        onClick={() => navigate('/applications/new')}
                         className='bg-indigo-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition'>
                         + Add Application
                     </button>
