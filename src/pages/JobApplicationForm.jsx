@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { createJobApplication } from '../api/jobApplications.api';
+import { toast } from 'react-hot-toast';
 
 const STATUS_OPTIONS = [
     "bookmarked",
@@ -52,6 +53,7 @@ const JobApplicationForm = () => {
             setError("");
 
             await createJobApplication(form);
+            toast.success("Application saved!");
             navigate("/applications");
         } catch(err) {
             setError(err.response?.data?.message || "Failed to save the application");
