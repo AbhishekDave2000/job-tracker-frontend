@@ -5,7 +5,9 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import JobApplications from './pages/JobApplications'
 import JobApplicationForm from './pages/JobApplicationForm'
+import JobApplicationDetail from './pages/JobApplicationDetail'
 import './App.css'
+import { Toaster } from 'react-hot-toast' 
 
 const queryClient = new QueryClient();
 
@@ -22,6 +24,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
+        <Toaster position="top-right" />
         <Routes>
 
           {/* Login and Register Routes */}
@@ -31,6 +34,7 @@ function App() {
           <Route element={<ProtectedLayout />}>
             <Route path="/applications" element={<JobApplications />}/>
             <Route path="/applications/new" element={<JobApplicationForm />} />
+            <Route path="/applications/:id" element={<JobApplicationDetail />} />
           </Route>
 
           {/* Default Router Redirect */}
