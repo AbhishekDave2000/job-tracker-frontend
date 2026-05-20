@@ -2,9 +2,8 @@ import { useState, useEffect }  from 'react';
 import { useNavigate }          from 'react-router-dom';
 import Navbar                   from '../components/Navbar';
 import StatusBadge              from '../components/StatusBadge';
-import { getJobApplications }   from '../api/jobApplications.api';
-
-
+import { getJobApplications, deleteJobApplication }   from '../api/jobApplications.api';
+import { toast } from 'react-hot-toast';
 
 const JobApplications = () => {
     const navigate = useNavigate();
@@ -29,6 +28,19 @@ const JobApplications = () => {
 
         fetchApplications();
     }, []);
+
+    const handleDelete = async (id) => {
+        if (!window.confirm("Delete this application") ) return
+
+        try {
+            await deleteJobApplication(id);
+            toast.success("Application deleted");
+
+            setApplications((prev) => prev.filter((app) => app.id != id));
+        } catch(err) {
+            toast.error("Failed To Delete");
+        }
+    }
 
     if(loading) {
         return (
@@ -85,7 +97,9 @@ const JobApplications = () => {
                                 className='bg-white border border-gray-200 rounded-xl px-6 py-4 flex items-center justify-between hover:shadow-sm transition'
                             >
                                 {/* Left Side */}
-                                <div>
+                                <div 
+                                    onClick={() => navigate(`/applications/${app.id}`)}
+                                >
                                     <h2 className='font-semibold text-gray-800'>{app.company_name}</h2>
                                     <p className='text-sm text-gray-500 mt-0.5'>{app.job_title}</p>
                                     <p className='text-xs text-gray-400 mt-1'>
@@ -99,6 +113,13 @@ const JobApplications = () => {
                                     <p className='text-xs text-gray-400'>
                                         {app.applied_date || "No Date"}
                                     </p>
+
+                                    <button 
+                                        className='text-xs text-red-400 hover:text-red-600 transition'
+                                        onClick={() => handleDelete(app.id)}
+                                    >
+                                        Delete
+                                    </button>
                                 </div>
                             </div>
                         ))}
