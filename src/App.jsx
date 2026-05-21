@@ -6,6 +6,7 @@ import Register from './pages/Register'
 import JobApplications from './pages/JobApplications'
 import JobApplicationForm from './pages/JobApplicationForm'
 import JobApplicationDetail from './pages/JobApplicationDetail'
+import JobApplicationUpdate from './pages/JobApplicationUpdate'
 import './App.css'
 import { Toaster } from 'react-hot-toast' 
 
@@ -35,6 +36,7 @@ function App() {
             <Route path="/applications" element={<JobApplications />}/>
             <Route path="/applications/new" element={<JobApplicationForm />} />
             <Route path="/applications/:id" element={<JobApplicationDetail />} />
+            <Route path="/applications/:id/edit" element={<JobApplicationUpdate />} />
           </Route>
 
           {/* Default Router Redirect */}
