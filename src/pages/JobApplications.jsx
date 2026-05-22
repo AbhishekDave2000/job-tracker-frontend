@@ -3,7 +3,7 @@ import { useNavigate }          from 'react-router-dom';
 import Navbar                   from '../components/Navbar';
 import StatusBadge              from '../components/StatusBadge';
 import { getJobApplications, deleteJobApplication }   from '../api/jobApplications.api';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 const JobApplications = () => {
     const navigate = useNavigate();
@@ -98,7 +98,7 @@ const JobApplications = () => {
                             >
                                 {/* Left Side */}
                                 <div 
-                                    className='w-full'
+                                    className='flex-1 cursor-pointer'
                                     onClick={() => navigate(`/applications/${app.id}`)}
                                 >
                                     <h2 className='font-semibold text-gray-800'>{app.company_name}</h2>

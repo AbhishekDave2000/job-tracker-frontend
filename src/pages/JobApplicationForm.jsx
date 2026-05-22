@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { getJobApplication, createJobApplication, updateJobApplication } from '../api/jobApplications.api';
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 const STATUS_OPTIONS = [
     "bookmarked",

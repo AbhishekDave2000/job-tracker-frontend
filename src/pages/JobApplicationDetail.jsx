@@ -10,7 +10,7 @@ const JobApplicationDetail = () => {
     const id = useParams().id;
     const navigate = useNavigate();
     
-    const [application, setApplication] = useState([]);
+    const [application, setApplication] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
