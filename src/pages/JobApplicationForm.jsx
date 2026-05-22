@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { createJobApplication } from '../api/jobApplications.api';
+import { getJobApplication, createJobApplication, updateJobApplication } from '../api/jobApplications.api';
 import { toast } from 'react-hot-toast';
 
 const STATUS_OPTIONS = [
     "bookmarked",
     "applied",
-    "interviewed",
+    "interview",
     "offer",
     "rejected",
     "withdrawn",
@@ -15,6 +15,12 @@ const STATUS_OPTIONS = [
 
 const JobApplicationForm = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const isEditing = Boolean(id); 
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [fetching, setFetching] = useState(isEditing);
 
     const [form, setForm] = useState({
         company_name:    "",
@@ -28,15 +34,53 @@ const JobApplicationForm = () => {
         salary_max:      "",
         job_description: "",
         notes:           "",
-    });
+    })
 
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+    useEffect(() => {
+        if (!isEditing) return
 
+        const fetchApplication = async () => {
+            try {
+                const response = await getJobApplication(id);
+                const app = response.data.application || [];
+
+                // console.log("Existing Application : ", app);
+
+                // Populate Form with the existing values in the application
+                setForm({
+                    company_name:    app.company_name       || "",
+                    job_title:       app.job_title          || "",
+                    job_url:         app.job_url            || "",
+                    location:        app.location           || "",
+                    remote:          app.remote             || false,
+                    status:          app.status             || "bookmarked",
+                    applied_date:    app. applied_date      || "",
+                    salary_min:      app.salary_min         || "",
+                    salary_max:      app.salary_max         || "",
+                    job_description: app.job_description    || "",
+                    notes:           app.notes              || "",
+                })
+            } catch(err) {
+                setError("Failed to load application");
+            } finally {
+                setFetching(false);
+            }
+        } 
+
+        fetchApplication()
+    }, [id, isEditing])
+
+    if(fetching) {
+        return(
+            <div>
+                <Navbar />
+                <p className='max-w-2xl mx-auto mt-8 p-8 text-center text-gray-600 border border-green-400 rounded-lg '>Loading ...</p>
+            </div>
+        )
+    }
+    
     const handleChange = (e) => {
-        const {name, value, type, checked} = e.target;
-        console.log(e.target);
-
+        const { name, value, type, checked } = e.target;
         setForm((prev) => ({
             ...prev,
             [name]: type === "checkbox" ? checked : value,
@@ -45,90 +89,107 @@ const JobApplicationForm = () => {
 
     const handleSubmit = async () => {
         if (!form.company_name || !form.job_title) {
-            setError("Company name and job title are required");
+            setError("Company name and the Job Title are required.")
             return
         }
-        try {
-            setLoading(true);
-            setError("");
 
-            await createJobApplication(form);
-            toast.success("Application saved!");
+        try {
+            setLoading(true)
+            setError("")
+
+            if(isEditing){
+                await updateJobApplication(id, form);
+                toast.success("Application Saved Successfully.")
+            } else {
+                await createJobApplication(form);
+                toast.success("Application Created Successfully.");
+            }
+
             navigate("/applications");
         } catch(err) {
-            setError(err.response?.data?.message || "Failed to save the application");
+            setError(err.response?.data?.message || "Failed to save the application." )
         } finally {
             setLoading(false);
         }
     }
 
-    return (
+    return(
         <div>
             <Navbar />
             <div className="max-w-2xl mx-auto px-6 py-8">
-                <div className='flex items-center gap-3 mb-6'>
+
+                {/* Header */}
+                <div className="flex items-center gap-3 mb-6">
                     <button
                         onClick={() => navigate("/applications")}
-                        className='text-gray-400 hover:text-gray-600 text-sm'
+                        className="text-gray-400 hover:text-gray-600 text-sm"
                     >
                         ← Back
                     </button>
                     <h1 className="text-2xl font-bold text-gray-800">
-                        Add Application
+                        {isEditing ? "Edit Application" : "Add Application"}
                     </h1>
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-4">
-                    {error && ( 
-                        <div className='bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg'>
+
+                    {/* Error */}
+                    {error && (
+                        <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg">
                             {error}
                         </div>
                     )}
 
+                    {/* Company Name */}
                     <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-1'>
-                            Company Name <span className='text-red-500'>*</span>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Company Name <span className="text-red-500">*</span>
                         </label>
-                        <input 
+                        <input
                             type="text"
                             name="company_name"
                             value={form.company_name}
                             onChange={handleChange}
-                            placeholder='Eg. Google'
-                            className='w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                            placeholder="eg. Google"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
+                    {/* Job Title */}
                     <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-1'>
-                            Job Title <span className='text-red-500'>*</span>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Job Title <span className="text-red-500">*</span>
                         </label>
-                        <input 
+                        <input
                             type="text"
                             name="job_title"
                             value={form.job_title}
                             onChange={handleChange}
-                            placeholder='Job Title...'
-                            className='w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                            placeholder="eg. Software Engineer"
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
+                    {/* Status */}
                     <div>
-                        <label className='block text-sm font-medium text-gray-700 mb-1'>
-                            Status <span className='text-red-500'>*</span>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Status
                         </label>
-                        <select 
-                            name="status" 
+                        <select
+                            name="status"
                             value={form.status}
                             onChange={handleChange}
-                            className='w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500'
+                            className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                            {STATUS_OPTIONS.map((option) => (
-                                <option key={option} value={option}>{option.charAt(0).toUpperCase() + option.slice(1)}</option>
+                            {STATUS_OPTIONS.map((s) => (
+                                <option key={s} value={s}>
+                                    {s.charAt(0).toUpperCase() + s.slice(1)}
+                                </option>
                             ))}
                         </select>
                     </div>
 
+                    {/* Job URL */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Job URL
@@ -142,7 +203,8 @@ const JobApplicationForm = () => {
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
-    
+
+                    {/* Location + Remote */}
                     <div className="flex gap-3 items-end">
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -157,7 +219,6 @@ const JobApplicationForm = () => {
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             />
                         </div>
-
                         <div className="flex items-center gap-2 pb-2">
                             <input
                                 type="checkbox"
@@ -173,6 +234,7 @@ const JobApplicationForm = () => {
                         </div>
                     </div>
 
+                    {/* Salary Range */}
                     <div className="flex gap-3">
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -186,8 +248,8 @@ const JobApplicationForm = () => {
                                 placeholder="eg. 80000"
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             />
-                        </div>
-                        <div className="flex-1">
+                            </div>
+                            <div className="flex-1">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Salary Max ($)
                             </label>
@@ -201,7 +263,8 @@ const JobApplicationForm = () => {
                             />
                         </div>
                     </div>
-                    
+
+                    {/* Applied Date */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Applied Date
@@ -215,6 +278,7 @@ const JobApplicationForm = () => {
                         />
                     </div>
 
+                    {/* Job Description */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Job Description
@@ -229,6 +293,7 @@ const JobApplicationForm = () => {
                         />
                     </div>
 
+                    {/* Notes */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Notes
@@ -243,6 +308,7 @@ const JobApplicationForm = () => {
                         />
                     </div>
 
+                    {/* Buttons */}
                     <div className="flex gap-3 pt-2">
                         <button
                             onClick={() => navigate("/applications")}
@@ -255,7 +321,10 @@ const JobApplicationForm = () => {
                             disabled={loading}
                             className="flex-1 bg-indigo-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 transition"
                         >
-                            {loading ? "Saving..." : "Save Application"}
+                            {loading
+                                ? isEditing ? "Updating..." : "Saving..."
+                                : isEditing ? "Update Application" : "Save Application"
+                            }
                         </button>
                     </div>
 
@@ -266,3 +335,4 @@ const JobApplicationForm = () => {
 }
 
 export default JobApplicationForm;
+
