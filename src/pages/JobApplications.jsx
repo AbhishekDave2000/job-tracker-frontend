@@ -16,7 +16,7 @@ const JobApplications = () => {
         const fetchApplications = async () => {
             try {
                 const response = await getJobApplications();
-                console.log("Applications: " + response.data.applications);
+                // console.log("Applications: " + response.data.applications);
                 const apps = response.data.applications || [];
                 setApplications(apps);
             } catch (err) {
@@ -98,6 +98,7 @@ const JobApplications = () => {
                             >
                                 {/* Left Side */}
                                 <div 
+                                    className='w-full'
                                     onClick={() => navigate(`/applications/${app.id}`)}
                                 >
                                     <h2 className='font-semibold text-gray-800'>{app.company_name}</h2>
