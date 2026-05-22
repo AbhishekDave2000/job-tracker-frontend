@@ -13,6 +13,7 @@ const JobApplicationDetail = () => {
     const [application, setApplication] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [activeTab, setActiveTab] = useState("contacts");
 
     useEffect( ()=> {
         const fetchApplication = async () => {
@@ -150,6 +151,27 @@ const JobApplicationDetail = () => {
                     )}
 
                 </div>
+            </div>
+
+            <div className='flex gap-2 mb-4 items-center justify-center'>
+                <button
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${activeTab === "contacts" ? "bg-indigo-600 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                    onClick={() => setActiveTab("contacts")}
+                >
+                    Contact
+                </button>
+
+                <button
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${activeTab === "followups" ? "bg-indigo-600 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"} `}
+                    onClick={() => setActiveTab("followups")}
+                >
+                    Follow Ups
+                </button>
+            </div>
+
+            <div className='bg-white rounded-2xl shadow-sm border border-gray-200 p-6'>
+                {activeTab === "contacts" && <p className="text-gray-400">This is the Contact Tab</p>}
+                {activeTab === "followups" && <p className="text-gray-400">This is the Follow Ups Tab</p>}
             </div>
         </div>
     )
