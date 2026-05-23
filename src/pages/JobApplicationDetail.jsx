@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import ContactsTab from './ContactsTab';
 
 import Navbar from '../components/Navbar';
 import StatusBadge from '../components/StatusBadge';
@@ -34,7 +35,7 @@ const JobApplicationDetail = () => {
         if (!window.confirm("Delete this application?")) return
 
         try {
-            await  deleteJobApplication(id);
+            await deleteJobApplication(id);
             toast.success("Job Application Successfully Deleted.")
             navigate("/applications");
         } catch (err) {
@@ -170,7 +171,7 @@ const JobApplicationDetail = () => {
             </div>
 
             <div className='bg-white rounded-2xl shadow-sm border border-gray-200 p-6'>
-                {activeTab === "contacts" && <p className="text-gray-400">This is the Contact Tab</p>}
+                {activeTab === "contacts" && <ContactsTab jobApplicationId={id} />}
                 {activeTab === "followups" && <p className="text-gray-400">This is the Follow Ups Tab</p>}
             </div>
         </div>
