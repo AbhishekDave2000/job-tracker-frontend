@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import ContactsTab from './ContactsTab';
+import ContactsTab from '../components/ContactsTab';
 
 import Navbar from '../components/Navbar';
 import StatusBadge from '../components/StatusBadge';
