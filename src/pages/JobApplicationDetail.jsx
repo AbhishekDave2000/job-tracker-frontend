@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ContactsTab from '../components/ContactsTab';
+import FollowUpsTab from '../components/FollowUpsTab';
 
 import Navbar from '../components/Navbar';
 import StatusBadge from '../components/StatusBadge';
@@ -172,7 +173,7 @@ const JobApplicationDetail = () => {
 
             <div className='bg-white rounded-2xl shadow-sm border border-gray-200 p-6'>
                 {activeTab === "contacts" && <ContactsTab jobApplicationId={id} />}
-                {activeTab === "followups" && <p className="text-gray-400">This is the Follow Ups Tab</p>}
+                {activeTab === "followups" && <FollowUpsTab jobApplicationId={id} />}
             </div>
         </div>
     )

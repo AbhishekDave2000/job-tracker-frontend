@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 const STATUS_OPTIONS = [
     "bookmarked",
     "applied",
-    "interview",
+    "interviewed",
     "offer",
     "rejected",
     "withdrawn",
