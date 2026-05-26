@@ -2,7 +2,9 @@ import { useState, useEffect }  from 'react';
 import { useNavigate }          from 'react-router-dom';
 import Navbar                   from '../components/Navbar';
 import StatusBadge              from '../components/StatusBadge';
-import { getJobApplications, deleteJobApplication }   from '../api/jobApplications.api';
+import { getJobApplications, 
+        deleteJobApplication, 
+        getJobApplicationsByStatus }   from '../api/jobApplications.api';
 import toast from 'react-hot-toast';
 
 const JobApplications = () => {
@@ -11,13 +13,21 @@ const JobApplications = () => {
     const [applications, setApplications]   = useState([]);
     const [loading, setLoading]             = useState(true);
     const [error, setError]                 = useState("");
+    const [filter, setFilter]               = useState("");
 
     useEffect(() => {
         const fetchApplications = async () => {
             try {
-                const response = await getJobApplications();
+                let response;
+                if ( filter.length === 0 ) {
+                    console.log("Hello From If")
+                    response = await getJobApplications();
+                } else {
+                    console.log("Hello From Else")
+                    response = await getJobApplicationsByStatus(filter);
+                }
                 // console.log("Applications: " + response.data.applications);
-                const apps = response.data.applications || [];
+                const apps = response?.data?.applications || [];
                 setApplications(apps);
             } catch (err) {
                 setError("Failed To Load Applications.");
@@ -27,7 +37,7 @@ const JobApplications = () => {
         }
 
         fetchApplications();
-    }, []);
+    }, [filter]);
 
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this application") ) return
@@ -81,12 +91,29 @@ const JobApplications = () => {
                     </button>
                 </div>
 
+                <div className='max-w-5xl flex items-center justify-end mb-6'>
+                    <select name="filter" id="filter" onChange={(e) => setFilter(e.target.value)} value={filter} className='font-semibold text-gray-400 outline-none mx-4'>
+                        <option value="">           No Selection</option>
+                        <option value="bookmarked"> Bookmarked</option>
+                        <option value="applied">    Applied</option>
+                        <option value="interviewed">Interviewed</option>
+                        <option value="offer">      Offer</option>
+                        <option value="rejected">   Rejected</option>
+                        <option value="withdrawn">  Withdrawn</option>
+                    </select>
+                    <button
+                        className='bg-indigo-800 text-white text-sm px-3 py-1.5 rounded-lg font-semibold hover:bg-indigo-700 transition'
+                    >
+                        Filter
+                    </button>
+                </div>
+
 
                 { applications.length === 0 ? (
                     <div className='text-center py-20'>
-                        <div className='text-lg text-gray-400'>No Applications Yet</div>
+                        <div className='text-lg text-gray-400'>No Applications With Specific Status Yet</div>
                         <p className='text-gray-300 text-sm mt-1'>
-                            Click "+ Add Application" to get started
+                            Click "+ Add Application"
                         </p>
                     </div>
                 ) : ( 
