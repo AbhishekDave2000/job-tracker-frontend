@@ -23,16 +23,8 @@ const ContactsTab = ({jobApplicationId}) => {
         const fetchContacts = async () => {
             try {
                 const response = await getContacts(jobApplicationId);
-                const raw      = response.data.data.data || []
-
-                const normalized = raw.map((item) => ({
-                                        id:           item.attributes.id,
-                                        name:         item.attributes.name,
-                                        email:        item.attributes.email,
-                                        phone_number: item.attributes.phone_number,
-                                        note:         item.attributes.note,
-                                    }))
-                setContacts(normalized);
+                const raw      = response.data.data || []                
+                setContacts(raw);
             } catch(err){
                 toast.error("Failed to Load the Contacts")
             } finally {
@@ -57,17 +49,12 @@ const ContactsTab = ({jobApplicationId}) => {
             setFormLoading(true)
             setFormError("")
             
+            // Get the response from the backend
             const response = await createContact(jobApplicationId, form);
-            const raw        = response.data.data.data
-            const newContact = {
-                id:           raw.id           || raw.attributes?.id,
-                name:         raw.name         || raw.attributes?.name,
-                email:        raw.email        || raw.attributes?.email,
-                phone_number: raw.phone_number || raw.attributes?.phone_number,
-                note:         raw.note         || raw.attributes?.note,
-            }
+            const newContact = response.data.data
             setContacts((prev) => [...prev, newContact])
 
+            //  reset the form
             setForm({ name: "", email: "", phone_number: "", note: "" })
             setShowForm(false)
             toast.success("Contact added!")
