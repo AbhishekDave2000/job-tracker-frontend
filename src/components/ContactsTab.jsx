@@ -1,13 +1,41 @@
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import { getContacts, 
         createContact,
-        deleteContact } from '../api/contacts.api'
+        deleteContact, 
+        updateContact} from '../api/contacts.api'
 
 const ContactsTab = ({jobApplicationId}) => {
+    const navigate = useNavigate();
     const [contacts,    setContacts]    = useState([]);
     const [loading,     setLoading]     = useState(true);
     const [showForm,    setShowForm]    = useState(false); 
+
+    const [editingId, setEditingId]     = useState(null);
+    const [editForm, setEditForm]       = useState({});
+
+    const handleEditClick = (contact) => {
+        setEditingId(contact.id);
+        setEditForm({
+            name:         contact.name,
+            email:        contact.email,
+            phone_number: contact.phone_number,
+            note:         contact.note,
+        })
+    }
+
+    const handleUpdate = async () => {
+        try {
+            await updateContact(editingId, editForm);
+            
+            setContacts((prev) => prev.map( (c) => c.id === editingId ? {...c, ...editForm} : c) )
+            setEditingId(null);
+            toast.success("Contact updated");
+        } catch(err) {
+            toast.error("Failed to update.")
+        }
+    }
 
     const [form, setForm] = useState({
         name:           "",
@@ -176,34 +204,79 @@ const ContactsTab = ({jobApplicationId}) => {
                 ) : (
                     <div className='space-y-3'>
                         {contacts.map((contact) => (
-                            <div
-                                key={contact.id}
-                                className="flex items-start justify-between border border-gray-100 rounded-xl p-4"
-                            >
-                            <div>
-                                <p className="font-medium text-gray-800 text-sm">
-                                    {contact.name}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-0.5">
-                                    {contact.email}
-                                </p>
-                                {contact.phone_number && (
-                                    <p className="text-xs text-gray-400 mt-0.5">
-                                        {contact.phone_number}
-                                    </p>
-                                )}
-                                {contact.note && (
-                                    <p className="text-xs text-gray-400 mt-1 italic">
-                                        {contact.note}
-                                    </p>
-                                )}
-                            </div>
-                            <button
-                                onClick={() => handleDelete(contact.id)}
-                                className="text-xs text-red-400 hover:text-red-600 transition"
-                            >
-                                Delete
-                            </button>
+                            <div key={contact.id} className="border border-gray-100 rounded-xl p-4">
+                                { editingId === contact.id ? (
+                                    <div className="space-y-2">
+                                        <input
+                                            type="text"
+                                            value={editForm.name}
+                                            onChange={(e) => setEditForm((prev) => ({ ...prev, name: e.target.value }))}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                                        />
+                                        <input
+                                            type="email"
+                                            value={editForm.email}
+                                            onChange={(e) => setEditForm((prev) => ({ ...prev, email: e.target.value }))}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                                        />
+                                        <input
+                                            type="text"
+                                            value={editForm.phone_number}
+                                            onChange={(e) => setEditForm((prev) => ({ ...prev, phone_number: e.target.value }))}
+                                            placeholder="+1 (555) 000-0000"
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        />
+
+                                        <textarea
+                                            value={editForm.note}
+                                            onChange={(e) => setEditForm((prev) => ({ ...prev, note: e.target.value }))}
+                                            placeholder="Note..."
+                                            rows={2}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                        />
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={handleUpdate}
+                                                className="text-xs bg-indigo-600 text-white px-3 py-1 rounded-lg"
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                onClick={() => setEditingId(null)}
+                                                className="text-xs border border-gray-300 px-3 py-1 rounded-lg"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-start justify-between">
+                                        <div>
+                                            <p className="font-medium text-gray-800 text-sm">{contact.name}</p>
+                                            <p className="text-xs text-gray-500 mt-0.5">{contact.email}</p>
+                                            {contact.phone_number && (
+                                                <p className="text-xs text-gray-400 mt-0.5">{contact.phone_number}</p>
+                                            )}
+                                            {contact.note && (
+                                                <p className="text-xs text-gray-400 mt-1 italic">{contact.note}</p>
+                                            )}
+                                        </div>
+                                        <div className='flex flex-col item-center justify-evenly'>
+                                            <button
+                                                onClick={() => handleEditClick(contact)}
+                                                className='text-sm font-semibold text-indigo-500 hover:text-indigo-700 transition'
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(contact.id)}
+                                                className="text-sm font-semibold text-red-400 hover:text-red-600 transition"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) }
                             </div>
                         ))}
                     </div>

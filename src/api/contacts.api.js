@@ -3,6 +3,9 @@ import api from './axios'
 export const getContacts = (jobApplicationId) => 
     api.get(`/contacts?job_application_id=${jobApplicationId}`);
 
+export const getContact = (contactId) => 
+    api.get(`/contacts/${contactId}`);
+
 export const createContact = (jobApplicationId, data) => 
     api.post(`/contacts?job_application_id=${jobApplicationId}`, { contact: data });
 
