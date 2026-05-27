@@ -273,13 +273,13 @@ const FollowUpsTab = ({jobApplicationId}) => {
                                         )}
                                     </div>
 
-                                    <div className="flex items-center gap-2 ml-4">
+                                    <div className="flex items-center justify-evenly gap-2 ml-4">
                                         {!followUp.completed && (
                                             <button
                                                 onClick={() => handleComplete(followUp.id)}
                                                 className="font-semibold text-sm bg-green-500 text-white hover:bg-green-700 transition px-3 py-1 border rounded-lg"
                                             >
-                                                ✓ Complete
+                                                Complete
                                             </button>
                                         )}
 

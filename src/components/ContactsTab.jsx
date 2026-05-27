@@ -261,16 +261,16 @@ const ContactsTab = ({jobApplicationId}) => {
                                                 <p className="text-xs text-gray-400 mt-1 italic">{contact.note}</p>
                                             )}
                                         </div>
-                                        <div className='flex flex-col item-center justify-evenly'>
+                                        <div className='flex item-center justify-evenly gap-2'>
                                             <button
                                                 onClick={() => handleEditClick(contact)}
-                                                className='text-sm font-semibold text-indigo-500 hover:text-indigo-700 transition'
+                                                className='text-sm font-semibold text-white bg-blue-400 hover:bg-blue-600 transition px-4 py-1 border rounded-lg'
                                             >
                                                 Edit
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(contact.id)}
-                                                className="text-sm font-semibold text-red-400 hover:text-red-600 transition"
+                                                className="text-sm font-semibold text-white bg-red-400 hover:bg-red-600 transition px-4 py-1 border rounded-lg"
                                             >
                                                 Delete
                                             </button>
