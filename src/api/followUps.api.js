@@ -12,7 +12,7 @@ export const createFollowUp = (jobApplicationId, data) =>
 export const completeFollowUp = (id) => 
     api.post(`/complete_follow_up/${id}`);
 
-export const updateFollowUP = (id, data) => 
+export const updateFollowUp = (id, data) => 
     api.put(`/follow_ups/${id}`, data);
 
 export const deleteFollowUp = (id) => 

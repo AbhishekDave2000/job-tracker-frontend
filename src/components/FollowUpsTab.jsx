@@ -2,7 +2,8 @@ import { useState, useEffect }   from "react"
 import { getFollowUps,
         createFollowUp,
         completeFollowUp,
-        deleteFollowUp }         from "../api/followUps.api"
+        deleteFollowUp, 
+        updateFollowUp}         from "../api/followUps.api"
 import toast                     from "react-hot-toast"
 
 const FollowUpBadge = ({followUp}) => {
@@ -37,7 +38,10 @@ const FollowUpsTab = ({jobApplicationId}) => {
     const [loading, setLoading]     = useState(true);
     const [showForm, setShowForm]   = useState(false);
 
+    const [editingId, setEditingId] = useState(null);
+    const [editForm, setEditForm]   = useState({});
 
+    
     const [form, setForm] = useState({
         message: "",
         remind_at: "",
@@ -131,6 +135,27 @@ const FollowUpsTab = ({jobApplicationId}) => {
         })
     }
 
+    const handleEditClick = (followUp) => {
+        setEditingId(followUp.id);
+        setEditForm({
+            message:    followUp.message,
+            remind_at:  followUp.remind_at,
+        })
+    } 
+
+    const handleEdit = async () => {
+        try {
+            await updateFollowUp(editingId, editForm);
+
+            setFollowUps((prev) => prev.map((f) => f.id === editingId ? {...f, ...editForm} : f ))
+            setEditingId(null)
+            toast.success("Follow up updated.");
+        } catch(err) {
+            toast.error("Failed to update.");
+        }
+    }
+
+
     if(loading) return <p className="text-gray-400 text-sm">Loading Follow Ups...</p>
 
     return(
@@ -200,40 +225,81 @@ const FollowUpsTab = ({jobApplicationId}) => {
             ) : (
                 <div className="space-y-3">
                     {followUps.map((followUp) => (
-                        <div 
-                            key={followUp.id} 
-                            className="flex items-start justify_between border border-gray-100 rounded-xl p-4"
-                        >
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <FollowUpBadge followUp={followUp}/>
+                        <div key={followUp.id} className="border border-gray-100 rounded-xl p-4">
+                            
+                            {editingId === followUp.id ? (
+                                <div className="space-y-2">
+                                    <input 
+                                        type="text"
+                                        name="message"
+                                        value={editForm.message}
+                                        onChange={(e) => setEditForm((prev) => ({...prev, message: e.target.value}) )}
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                                    />
+
+                                    <input 
+                                        type="datetime-local" 
+                                        name="remind_at"
+                                        value={editForm.remind_at}
+                                        onChange={(e) => setEditForm( (prev) => ( {...prev, remind_at: e.target.value}) )}
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                                    />
+
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={handleEdit}
+                                            className="text-xs bg-indigo-600 text-white px-3 py-1 rounded-lg"
+                                        >
+                                            Save
+                                        </button>
+                                        <button
+                                            onClick={() => setEditingId(null)}
+                                            className="text-xs border border-gray-300 px-3 py-1 rounded-lg"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
                                 </div>
-                                <p className="text-sm text-gray-800 font-medium">{followUp.message}</p>
-                                <p className="text-xs text-gray-400 mt-1">{formatDate(followUp.remind_at)}</p>
-                                {followUp.completed_at && (
-                                    <p className="text-xs text-green-500 mt-0.5">
-                                        Completed {formatDate(followUp.completed_at)}
-                                    </p>
-                                )}
-                            </div>
+                            ) : (
+                                <div className="flex items-start justify-between">
+                                    <div >
+                                        <div className="flex items-center gap-2 mb-1"> <FollowUpBadge followUp={followUp}/> </div>
+                                        <p className="text-sm text-gray-800 font-medium">{followUp.message}</p>
+                                        <p className="text-xs text-gray-400 mt-1">{formatDate(followUp.remind_at)}</p>
+                                        {followUp.completed_at && (
+                                            <p className="text-xs text-green-500 mt-0.5">
+                                                Completed {formatDate(followUp.completed_at)}
+                                            </p>
+                                        )}
+                                    </div>
 
-                            <div className="flex flex-col items-end gap-2 ml-4">
-                                {!followUp.completed && (
-                                    <button
-                                        onClick={() => handleComplete(followUp.id)}
-                                        className="text-xs text-green-500 hover:text-green-700 transition"
-                                    >
-                                        ✓ Complete
-                                    </button>
-                                )}
+                                    <div className="flex items-center gap-2 ml-4">
+                                        {!followUp.completed && (
+                                            <button
+                                                onClick={() => handleComplete(followUp.id)}
+                                                className="font-semibold text-sm bg-green-500 text-white hover:bg-green-700 transition px-3 py-1 border rounded-lg"
+                                            >
+                                                ✓ Complete
+                                            </button>
+                                        )}
 
-                                <button
-                                    onClick={() => handleDelete(followUp.id)}
-                                    className="text-xs text-red-400 hover:text-red-600 transition"
-                                >
-                                    Delete
-                                </button>
-                            </div>
+                                        <button 
+                                            onClick={() => handleEditClick(followUp)}
+                                            className="font-semibold text-sm text-white bg-blue-400 hover:bg-blue-600 transition px-3 py-1 border rounded-lg"
+                                        >
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleDelete(followUp.id)}
+                                            className="font-semibold text-sm text-white bg-red-400 hover:bg-red-600 transition px-3 py-1 border rounded-lg"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                            
                         </div>
                     ))}
                 </div>
